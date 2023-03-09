@@ -28,7 +28,7 @@ def postwordEnding(postList):
 
 @register.filter(name='censor')
 def censor(text):
-    negative_words = ['хрен', 'жопа']
+    negative_words = ['хрен', 'жопа', 'жопе']
     word_list = text.split()
     for i, word in enumerate(word_list):
         for negative in negative_words:
