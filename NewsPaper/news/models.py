@@ -6,6 +6,9 @@ from django.db.models import Sum
 class Category(models.Model):
     name = models.CharField(max_length=255, unique=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Post(models.Model):
     class Types(models.TextChoices):
@@ -32,10 +35,16 @@ class Post(models.Model):
     def preview(self):
         return self.text[:50] + '...'
 
+    def __str__(self):
+        return self.title
+
 
 class PostCategory(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.category.name
 
 
 class Comment(models.Model):
@@ -53,6 +62,9 @@ class Comment(models.Model):
         self.rating -= 1
         self.save()
 
+    def __str__(self):
+        return self.text
+
 
 class Author(models.Model):
     rating = models.IntegerField(default=0)
@@ -64,3 +76,6 @@ class Author(models.Model):
         comments_rating_from_authors_posts = Comment.objects.filter(post__author=self).aggregate(sum=Sum('rating'))['sum']
         self.rating = posts_rating * 3 + authors_comments_rating + comments_rating_from_authors_posts
         self.save()
+
+    def __str__(self):
+        return self.user.username
