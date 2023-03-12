@@ -28,9 +28,9 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
-STATICFILES_DIRS = [
-    BASE_DIR / 'static'
-]
+STATICFILES_DIRS = (
+    BASE_DIR / 'static',
+)
 
 # Application definition
 
@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'news',
-    'accounts'
+    'accounts',
+    'django_filters',
 ]
 
 MIDDLEWARE = [

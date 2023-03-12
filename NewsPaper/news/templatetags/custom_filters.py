@@ -35,6 +35,6 @@ def censor(text):
             if negative in word.lower():
                 start_ind = word.lower().find(negative)
                 end_ind = start_ind + len(negative)
-                word_list[i] = word[:start_ind] + 'Х' * len(negative) + word[end_ind:]
+                word_list[i] = word[:start_ind] + '*' * len(negative) + word[end_ind:]
     return ' '.join(word_list)
 

@@ -80,7 +80,7 @@
                                     <ul class="list-inline mb-0">
 
                                         {% for category in categories %}
-                                            <li class="list-inline-item"><a href="#!">{{ category.name }}</a></li>
+                                            <li class="list-inline-item"><a href="/news/search?category__name={{ category.name }}">{{ category.name }}</a></li>
                                         {% endfor %}
 
                                     </ul>
