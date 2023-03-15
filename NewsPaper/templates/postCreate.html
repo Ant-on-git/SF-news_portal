@@ -1,0 +1,47 @@
+{% extends 'default.html' %}
+{% load custom_filters %}
+
+
+{% block title %}
+    {% if edit %}
+        {{ edit }} пост
+    {% else %}
+        добавить пост
+    {% endif %}
+{% endblock title %}
+
+
+{% block page_preview %}
+    <div class="text-center my-3">-->
+      <h1 class="display-6 fw-bold text-white mb-2">
+        {% if edit %}
+            {{ edit }} пост
+        {% else %}
+            добавить пост
+        {% endif %}
+      </h1>
+      <p class="lead text-white-50 mb-4"></p>
+    </div>
+{% endblock page_preview %}
+
+
+{% block content %}
+
+    <div class="py-5 col-lg-6 mx-sm-auto">
+            <div class="card mb-4">
+                    <form method="post" class="card-body">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div class="mb-4">
+                                {{ field.label_tag }}&nbsp;&nbsp;&nbsp;{{ field }}
+                            </div>
+                        {% endfor %}
+                        <div class="d-md-flex">
+                            <input class="btn btn-primary mx-sm-auto px-md-5" type="submit" value="{% if edit %}{{ edit }}{% else %}добавить{% endif %}">
+                        </div>
+
+                    </form>
+            </div>
+    </div>
+
+{% endblock content %}

@@ -38,6 +38,10 @@ class Post(models.Model):
     def __str__(self):
         return self.title
 
+    def get_absolute_url(self):
+        # после добавления поста через форму django сам перенаправляет на вохвращаемый здесь адрес
+        return f'/news/{self.id}'
+
 
 class PostCategory(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)

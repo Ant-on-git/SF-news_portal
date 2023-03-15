@@ -15,9 +15,6 @@
       <h1 class="display-6 fw-bold text-white mb-2">
           {{ post.title | censor }}
       </h1>
-      <p class="lead text-white-50 mb-4">
-          {{ post.preview | censor }}
-      </p>
   </div>
 {% endblock page_preview %}
 
@@ -36,32 +33,50 @@
                             <div class="text-muted fst-italic mb-2">Пост создан {{ post.datetime_create | date:'d M Y' }} в {{ post.datetime_create | date:'H:i' }} пользователем {{ post.author.user.username }}</div>
                             <!-- Post categories-->
                             {% for category in post.category.all %}
-                                <a class="badge bg-secondary text-decoration-none link-light" href="#!">{{ category.name }}</a>
+                                <div class="badge bg-secondary link-light">{{ category.name }}</div>
                             {% endfor %}
 
                         </header>
                         <!-- Post content-->
-                        <section class="mb-5">
+                        <section class="mb-1">
 
-                            <p class="fs-5 mb-4" style="text-align: justify">{{ post.text | censor }}</p>
+                            <p class="fs-5 mb-3" style="text-align: justify">{{ post.text | censor }}</p>
 
                         </section>
+                        <!-- рейтинг -->
+                        <div class="hstack mb-4 justify-content-end fs-5">
+                            <div class="align-items-center justify-content-center px-2">
+                                <button id="{{ post.pk }}_post-rating-down" class="fs-6 bg-danger link-light rating-button"><</button>
+                                <span class="px-2 fw-bold">{{ post.rating }}</span>
+                                <button  id="{{ post.pk }}_post-rating-up" class="fs-6 bg-success link-light rating-button">></button>
+                            </div>
+                        </div>
                     </article>
                     <!-- Comments section-->
                     {% if comments %}
                     <section class="mb-5">
-                        <div class="card bg-light">
-                            <div class="card-body">
+                        <div class="card bg-black bg-opacity-10">
+                            <div class="card-body" style="padding-bottom: 0">
 
                                     <!-- comment-->
                                     {% for comment in comments %}
-                                        <div class="d-flex mb-3">
+                                    <div class="my-sm-2" style="margin-bottom: 0 !important; border-bottom: 1px solid white">
+                                        <div class="d-flex mb-1">
                                             <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
                                             <div class="ms-3">
                                                 <div class="fw-bold">{{ comment.user.username }}</div>
                                                 {{ comment.text | addSmile:5 | censor }}
                                             </div>
                                         </div>
+                                        <!-- рейтинг -->
+                                        <div class="hstack justify-content-end">
+                                            <div class="align-items-center justify-content-center px-1">
+                                                <button id="{{ comment.pk }}_comment-rating-down" class="fs-7 bg-danger link-light rating-button comment-rating"><</button>
+                                                <span class="px-2 fw-bold">{{ comment.rating }}</span>
+                                                <button  id="{{ comment.pk }}_comment-rating-up" class="fs-7 bg-success link-light rating-button comment-rating">></button>
+                                            </div>
+                                        </div>
+                                    </div>
                                     {% endfor %}
 
                             </div>
@@ -80,7 +95,7 @@
                                     <ul class="list-inline mb-0">
 
                                         {% for category in categories %}
-                                            <li class="list-inline-item"><a href="/news/search?category__name={{ category.name }}">{{ category.name }}</a></li>
+                                            <li class="list-inline-item"><a href="/news/search?category={{ category.name }}">{{ category.name }}</a></li>
                                         {% endfor %}
 
                                     </ul>

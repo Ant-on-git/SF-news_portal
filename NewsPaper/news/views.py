@@ -2,9 +2,10 @@
 
 # Create your views here.
 
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Post, Comment, Category
 from .filters import PostFilter
+from .forms import PostForm
 
 
 class PostList(ListView):
@@ -39,8 +40,8 @@ class PostSearch(ListView):
         queryset = super().get_queryset()
         return PostFilter(self.request.GET, queryset=queryset).qs
 
-    def get_context_data(self):
-        context = super().get_context_data()
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         context['filter'] = PostFilter(self.request.GET, queryset=self.get_queryset())
 
         request_copy = self.request.GET.copy()
@@ -49,4 +50,37 @@ class PostSearch(ListView):
         if not clean_get:
             context['postSearch'] = []
             context['filter.qs'] = []
+        return context
+
+
+class PostCreate(CreateView):
+    template_name = 'postCreate.html'
+    form_class = PostForm
+
+
+class PostUpdate(UpdateView):
+    template_name = 'postCreate.html'
+    form_class = PostForm
+
+    def get_object(self, **kwargs):
+        id = self.kwargs.get('pk')
+        return Post.objects.get(id=id)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['edit'] = 'изменить'
+
+        return context
+
+
+
+class PostDelete(DeleteView):
+    template_name = 'postDelete.html'
+    queryset = Post.objects.all()
+    success_url = '/news/'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comments'] = Comment.objects.filter(post=kwargs['object'])
+
         return context
