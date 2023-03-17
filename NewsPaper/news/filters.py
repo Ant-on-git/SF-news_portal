@@ -18,7 +18,9 @@ class PostFilter(FilterSet):
         field_name='title',
         lookup_expr='icontains',
         label='Тема поста',
-        widget=TextInput(attrs={'class': 'form-control'}))
+        widget=TextInput(attrs={
+            'class': 'form-control',
+            'style': 'width: calc(100% - 8em); display: inline-block'}))
     author = CharFilter(
         field_name='author__user__username',
         lookup_expr='icontains',
