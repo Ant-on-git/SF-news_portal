@@ -1,0 +1,33 @@
+{% extends 'default.html' %}
+{% load custom_filters %}
+
+{% block title %}
+  {% block head_title %}{% endblock %}
+{% endblock title %}
+
+
+{% block page_preview %}
+  <div class="text-center my-4">-->
+      <h1 class="display-6 fw-bold text-white mb-2">
+          {% block page_preview_text %}{% endblock page_preview_text %}
+      </h1>
+      <p class="lead text-white-50 mb-4"></p>
+  </div>
+{% endblock page_preview %}
+
+
+{% block default_content %}
+    <section>
+        <div class="container px-5">
+            <div class="py-5 col-lg-10 mx-sm-auto">
+                {% block body %}
+                    {% block content %}
+                    {% endblock content %}
+                {% endblock body %}
+
+                {% block extra_body %}
+                {% endblock extra_body %}
+            </div>
+        </div>
+    </section>
+{% endblock default_content %}

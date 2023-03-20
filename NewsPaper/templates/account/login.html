@@ -1,0 +1,71 @@
+{% extends "account/base.html" %}
+
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block head_title %}{% trans "Sign In" %}{% endblock %}
+{% block page_preview_text %}{% trans "Sign In" %}{% endblock page_preview_text %}
+
+
+{% block content %}
+  {% get_providers as socialaccount_providers %}
+  {% if socialaccount_providers %}
+
+<p>
+{% blocktrans with site.name as site_name %}Please sign in with one
+of your existing third party accounts. Or, <a href="{{ signup_url }}">sign up</a>
+for a {{ site_name }} account and sign in below:{% endblocktrans %}
+</p>
+
+<!--    <div class="socialaccount_ballot">-->
+<!--      <ul class="socialaccount_providers">-->
+<!--        <div class="badge bg-warning bg-opacity-75">-->
+<!--          <div class="fs-5">-->
+<!--        {% include "socialaccount/snippets/provider_list.html" with process="login" %}-->
+<!--        </div></div>-->
+<!--      </ul>-->
+<!--      <div class="login-or">{% trans 'or' %}</div>-->
+<!--    </div>-->
+    {% include "socialaccount/snippets/login_extra.html" %}
+
+  {% else %}
+<p>{% blocktrans %}If you have not created an account yet, then please
+<a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
+  {% endif %}
+  <div class="d-flex justify-content-center">
+    <div class="col-lg-6">
+      <div class="card mb-sm-3">
+        <form class="login card-body" method="POST" action="{% url 'account_login' %}">
+          {% csrf_token %}
+          {% for field in form %}
+            <div class="mb-4">
+              {{ field.label_tag }}&nbsp;&nbsp;&nbsp;{{ field }}
+            </div>
+          {% endfor %}
+          {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+          {% endif %}
+          <div class="mb-4">
+            <a class="button secondaryAction" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+          </div>
+          <button class="primaryAction btn btn-primary px-md-4" type="submit">{% trans "Sign In" %}</button>
+          {% if form.errors %}
+            {% for field in form %}
+                <ul>
+                {% for error in field.errors %}
+                    <li>{{ error|escape }}</li>
+                {% endfor %}
+                </ul>
+            {% endfor %}
+            <ul>
+            {% for error in form.non_field_errors %}
+                <li>{{ error|escape }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        </form>
+      </div>
+      <a class="badge btn btn-primary text-decoration-none link-light fs-6" href="{% provider_login_url 'google' process='login' %}">Вход через Google</a>
+    </div>
+  </div>
+{% endblock %}

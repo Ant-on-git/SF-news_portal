@@ -30,6 +30,8 @@
                             <li class="nav-item"><a class="nav-link active" aria-current="page" href="/news">все посты</a></li>
                             <li class="nav-item"><a class="nav-link" href="/news/search">поиск</a></li>
                             <li class="nav-item"><a class="nav-link" href="/news/add">добавить пост</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/accounts/login">войти</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/accounts/logout">выйти</a></li>
                             <li class="nav-item"><a class="nav-link" href="/admin/">admin</a></li>
                         </ul>
                     </div>
@@ -50,8 +52,8 @@
 
             <!-- Features section-->
             <div class="main">
-                {% block content %}
-                {% endblock content %}
+                {% block default_content %}
+                {% endblock default_content %}
 
                 {% block content_pagination %}
                 {% endblock content_pagination %}

@@ -19,4 +19,15 @@ if (addPost_type) {
     }
 }
 
+// добавляем класс form-control нужным тегам (формы allauth)
+ids = ['id_login', 'id_password', 'id_password1', 'id_password2', 'id_email', ]
+for (let id of ids) {
+    let tag = document.getElementById(id)
+    if (tag) {
+        tag.classList.add('form-control')
+        tag.classList.add('d-sm-inline-block')
+        tag.style = 'width: calc(100% - 5em)'
+    }
+}
+
 
