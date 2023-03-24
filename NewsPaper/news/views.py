@@ -8,7 +8,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from .models import Post, Comment, Category
 from .filters import PostFilter
 from .forms import PostForm
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 
 class PostList(ListView):
@@ -23,6 +23,8 @@ class PostList(ListView):
         if self.request.user.is_authenticated:
             context['username'] = user.username if user.username else user.email
             context['is_not_author'] = not user.groups.filter(name='authors').exists()
+            context['links'] = ({'class': 'text-secondary', 'href': '/edit', 'text': 'редактировать'},
+                                {'class': 'text-danger', 'href': '/delete', 'text': 'удалить'})
         return context
 
 
@@ -59,6 +61,8 @@ class PostSearch(ListView):
         if self.request.user.is_authenticated:
             context['username'] = user.username if user.username else user.email
             context['is_not_author'] = not user.groups.filter(name='authors').exists()
+            context['links'] = ({'class': 'text-secondary', 'href': '/edit', 'text': 'редактировать'},
+                                {'class': 'text-danger', 'href': '/delete', 'text': 'удалить'})
 
         context['filter'] = PostFilter(self.request.GET, queryset=self.get_queryset())
         request_copy = self.request.GET.copy()
@@ -70,7 +74,8 @@ class PostSearch(ListView):
         return context
 
 
-class PostCreate(LoginRequiredMixin, CreateView):
+class PostCreate(PermissionRequiredMixin, CreateView):
+    permission_required = ('news.add_post', )
     template_name = 'postCreate.html'
     form_class = PostForm
     def get_context_data(self, **kwargs):
@@ -81,7 +86,8 @@ class PostCreate(LoginRequiredMixin, CreateView):
             context['is_not_author'] = not user.groups.filter(name='authors').exists()
         return context
 
-class PostUpdate(LoginRequiredMixin, UpdateView):
+class PostUpdate(PermissionRequiredMixin, UpdateView):
+    permission_required = ('news.change_post',)
     template_name = 'postCreate.html'
     form_class = PostForm
 
@@ -100,7 +106,8 @@ class PostUpdate(LoginRequiredMixin, UpdateView):
 
 
 
-class PostDelete(LoginRequiredMixin, DeleteView):
+class PostDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = ('news.delete_post',)
     template_name = 'postDelete.html'
     queryset = Post.objects.all()
     success_url = '/news/'

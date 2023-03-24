@@ -41,8 +41,11 @@
                                 <i class="bi bi-arrow-right"></i>
                             </a>
                             <div>
-                                <a class="text-decoration-none text-secondary" href="{{ post.pk }}/edit">редактировать</a>
-                                <a class="text-decoration-none text-danger" href="{{ post.pk }}/delete">удалить</a>
+                                {% if links %}
+                                {% for link in links %}
+                                    <a class="text-decoration-none {{ link.class }}" href="{{ post.pk }}{{ link.href }}">{{ link.text }}</a>
+                                {% endfor %}
+                                {% endif %}
                             </div>
                         </div>
                     {% endfor %}
