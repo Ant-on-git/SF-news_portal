@@ -7,7 +7,7 @@
 
 
 {% block page_preview %}
-  <div class="text-center my-4">-->
+  <div class="text-center my-1">-->
       <h1 class="display-6 fw-bold text-white mb-2">
           Лучшие посты со всего рунета!
       </h1>
@@ -16,14 +16,20 @@
 {% endblock page_preview %}
 
 
+{% block page_preview-right_side %}
+
+{% endblock page_preview-right_side %}
+
+
 {% block default_content %}
-    <section class="py-5 border-bottom" id="features">
+    <section class="py-1 border-bottom" id="features">
         <div class="container px-5 my-5">
             <div class="row gx-5">
 
+
                 {% if postList %}
                     <div class="col-lg-12 mb-5">
-                        <h2 class="h4 fw-bolder text-center">{{ postList | postwordEnding }}:</h2>
+                        <p class="h4 fw-bolder text-center">{{ postList | postwordEnding }}:</p>
                     </div>
                     {% for post in postList %}
                         <div class="col-lg-4 mb-5">

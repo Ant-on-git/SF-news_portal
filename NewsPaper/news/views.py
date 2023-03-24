@@ -1,7 +1,9 @@
 # from django.shortcuts import render
 
 # Create your views here.
-
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group
+from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Post, Comment, Category
 from .filters import PostFilter
@@ -15,6 +17,13 @@ class PostList(ListView):
     context_object_name = 'postList'
     queryset = Post.objects.order_by('-id')  # queryset встроенная переменная, по умолчанию забирает
                                              # все записи по порядку из модели. т.е. = Post.objects.all()
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        if self.request.user.is_authenticated:
+            context['username'] = user.username if user.username else user.email
+            context['is_not_author'] = not user.groups.filter(name='authors').exists()
+        return context
 
 
 class PostDetail(DetailView):
@@ -22,8 +31,11 @@ class PostDetail(DetailView):
     template_name = 'postDetails.html'
     context_object_name = 'post'
     def get_context_data(self, **kwargs):
-        # сначала вызываем базовую реалзацю
         context = super().get_context_data(**kwargs)
+        user = self.request.user
+        if self.request.user.is_authenticated:
+            context['username'] = user.username if user.username else user.email
+            context['is_not_author'] = not user.groups.filter(name='authors').exists()
         # добавляем комменты к статье
         context['comments'] = Comment.objects.filter(post=kwargs['object'])
         # добавляем категории
@@ -43,8 +55,12 @@ class PostSearch(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['filter'] = PostFilter(self.request.GET, queryset=self.get_queryset())
+        user = self.request.user
+        if self.request.user.is_authenticated:
+            context['username'] = user.username if user.username else user.email
+            context['is_not_author'] = not user.groups.filter(name='authors').exists()
 
+        context['filter'] = PostFilter(self.request.GET, queryset=self.get_queryset())
         request_copy = self.request.GET.copy()
         clean_get = request_copy.pop('page', True) and request_copy.urlencode()
         context['clean_get_request'] = clean_get
@@ -57,7 +73,13 @@ class PostSearch(ListView):
 class PostCreate(LoginRequiredMixin, CreateView):
     template_name = 'postCreate.html'
     form_class = PostForm
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        if self.request.user.is_authenticated:
+            context['username'] = user.username if user.username else user.email
+            context['is_not_author'] = not user.groups.filter(name='authors').exists()
+        return context
 
 class PostUpdate(LoginRequiredMixin, UpdateView):
     template_name = 'postCreate.html'
@@ -70,7 +92,10 @@ class PostUpdate(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['edit'] = 'изменить'
-
+        user = self.request.user
+        if self.request.user.is_authenticated:
+            context['username'] = user.username if user.username else user.email
+            context['is_not_author'] = not user.groups.filter(name='authors').exists()
         return context
 
 
@@ -83,4 +108,19 @@ class PostDelete(LoginRequiredMixin, DeleteView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['comments'] = Comment.objects.filter(post=kwargs['object'])
+        user = self.request.user
+        if self.request.user.is_authenticated:
+            context['username'] = user.username if user.username else user.email
+            context['is_not_author'] = not user.groups.filter(name='authors').exists()
         return context
+
+
+
+@login_required
+def get_in_author_group(request):
+    author_group = Group.objects.get(name='authors')
+    if not request.user.groups.filter(name='authors').exists():
+        author_group.user_set.add(request.user)
+    redirect_from = request.META['HTTP_REFERER']
+    return redirect(redirect_from)
+

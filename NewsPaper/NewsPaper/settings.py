@@ -112,6 +112,7 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+ACCOUNT_FORMS = {'signup': 'accounts.forms.CustomAllauthSignupForm'}
 
 WSGI_APPLICATION = 'NewsPaper.wsgi.application'
 

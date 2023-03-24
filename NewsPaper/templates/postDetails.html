@@ -30,7 +30,7 @@
                         <header class="mb-4">
 
                             <!-- Post meta content-->
-                            <div class="text-muted fst-italic mb-2">Пост создан {{ post.datetime_create | date:'d M Y' }} в {{ post.datetime_create | date:'H:i' }}. Автор {{ post.author.user.username }}</div>
+                            <div class="text-muted fst-italic mb-2">Автор: {{ post.author.user.username }}<br>{{ post.datetime_create | date:'d M Y' }} в {{ post.datetime_create | date:'H:i' }}</div>
                             <!-- Post categories-->
                             {% for category in post.category.all %}
                                 <div class="badge bg-secondary link-light">{{ category.name }}</div>

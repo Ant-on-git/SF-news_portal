@@ -11,7 +11,7 @@ class PostForm(ModelForm):
     )
     type = fields.ChoiceField(
         label='Тип',
-        choices=(('статья', 'статья'), ('пост', 'пост')),
+        choices=(('статья', 'статья'), ('новость', 'новость')),
         widget=RadioSelect()
     )
     title = fields.CharField(

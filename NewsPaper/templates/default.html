@@ -30,8 +30,6 @@
                             <li class="nav-item"><a class="nav-link active" aria-current="page" href="/news">все посты</a></li>
                             <li class="nav-item"><a class="nav-link" href="/news/search">поиск</a></li>
                             <li class="nav-item"><a class="nav-link" href="/news/add">добавить пост</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/accounts/login">войти</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/accounts/logout">выйти</a></li>
                             <li class="nav-item"><a class="nav-link" href="/admin/">admin</a></li>
                         </ul>
                     </div>
@@ -41,10 +39,38 @@
             <header class="bg-dark py-1">
                 <div class="container px-5">
                     <div class="row gx-5 justify-content-center">
+                        <div class="col-lg-3"></div>
                         <div class="col-lg-6">
-
                             {% block page_preview %}{% endblock page_preview %}
-
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="text-muted my-1 flex-right-bottom user-info">
+                            {% if username %}
+                                <p class="my-md-1">Доброго дня, {{ username }}!</p>
+                                <p class="flex-right-bottom my-md-1">ваш статус:
+                                    {% if is_not_author %}
+                                        читатель.
+                                        <button class="btn btn-secondary py-0 my-md-1">
+                                            <a class="text-decoration-none link-light" href="get_in_author_group">стать автором</a>
+                                        </button>
+                                        {% else %}
+                                            автор!
+                                    {% endif %}
+                                </p>
+                                <div class="navbar-dark">
+                                    <div class="navbar-nav">
+                                        <a class="nav-link p-0 mt-1 text-opacity-75" href="/accounts/logout">выйти</a>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <p class="my-md-0">Кто ты, воин?</p>
+                                <div class="navbar-dark">
+                                    <div class="navbar-nav">
+                                        <a class="nav-link" href="/accounts/login">войти</a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
