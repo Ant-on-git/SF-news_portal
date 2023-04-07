@@ -34,3 +34,25 @@ class PostForm(ModelForm):
     class Meta:
         model = Post
         fields = ['author', 'type', 'title', 'category', 'rating', 'text']
+
+
+class SubscribeForm(ModelForm):
+    name = ModelMultipleChoiceField(
+        label='Категория',
+        queryset=Category.objects.all(),
+        widget=CheckboxSelectMultiple(attrs={'class': 'py-sm-1'})
+    )
+
+    # def __init__(self, *args, **kwargs):
+    #     print(self.__dict__)
+    #     print('ARGS ARGS', args)
+    #     print('KWARGS KWARGS', kwargs)
+    #     super(SubscribeForm, self).__init__(*args, **kwargs)
+    #     print(self.__dict__)
+    #     print('ARGS ARGS', args)
+    #     print('KWARGS KWARGS', kwargs)
+
+
+    class Meta:
+        model = Category
+        fields = ['name']

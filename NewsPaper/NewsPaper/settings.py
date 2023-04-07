@@ -10,9 +10,14 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 from pathlib import Path
+import os
+from dotenv import dotenv_values
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+dotenv_data = dotenv_values(dotenv_path=os.path.abspath(os.path.join(BASE_DIR, '..', 'venv', '.env')))
 
 
 # Quick-start development settings - unsuitable for production
@@ -116,6 +121,12 @@ ACCOUNT_FORMS = {'signup': 'accounts.forms.CustomAllauthSignupForm'}
 
 WSGI_APPLICATION = 'NewsPaper.wsgi.application'
 
+
+EMAIL_HOST = 'smtp.yandex.ru' # адрес сервера Яндекс-почты для всех один и тот же
+EMAIL_PORT = 465 # порт smtp сервера тоже одинаковый
+EMAIL_HOST_USER = 'A909NT' # ваше имя пользователя, например если ваша почта user@yandex.ru, то сюда надо писать user, иными словами, это всё то что идёт до собаки
+EMAIL_USE_SSL = True # Яндекс использует ssl, подробнее о том, что это, почитайте на Википедии, но включать его здесь обязательно
+EMAIL_HOST_PASSWORD = dotenv_data.get('EMAIL_HOST_PASSWORD')
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases

@@ -3,11 +3,14 @@
 # Create your views here.
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
+from django.core.mail import EmailMultiAlternatives
 from django.shortcuts import redirect
+from django.template.loader import render_to_string
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+
 from .models import Post, Comment, Category
 from .filters import PostFilter
-from .forms import PostForm
+from .forms import PostForm, SubscribeForm
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 
@@ -51,6 +54,14 @@ class PostSearch(ListView):
     context_object_name = 'postSearch'
     paginate_by = 10
 
+    def get_subscribeForm(self):
+        subscribeForm = SubscribeForm()
+        user = self.request.user
+        alredy_subscribed = Category.objects.filter(subscribers__in=[user.id])
+        alredy_subscribed_list = [category.id for category in alredy_subscribed]
+        subscribeForm.initial = {'name': alredy_subscribed_list}
+        return subscribeForm
+
     def get_queryset(self):
         queryset = super().get_queryset()
         return PostFilter(self.request.GET, queryset=queryset).qs
@@ -71,6 +82,8 @@ class PostSearch(ListView):
         if not clean_get:
             context['postSearch'] = []
             context['filter.qs'] = []
+
+        context['subscribeForm'] = self.get_subscribeForm()
         return context
 
 
@@ -85,6 +98,35 @@ class PostCreate(PermissionRequiredMixin, CreateView):
             context['username'] = user.username if user.username else user.email
             context['is_not_author'] = not user.groups.filter(name='authors').exists()
         return context
+
+    @staticmethod
+    def send_message(username, email, title, text):
+        html_email_message = render_to_string('new_post_email_notification.html', {'username': username, 'title': title,'text': text})
+        msg = EmailMultiAlternatives(
+            subject=title,
+            body=text,
+            from_email='A909NT@yandex.ru',
+            to=[email]
+        )
+        msg.attach_alternative(html_email_message, 'text/html')
+        try:
+            msg.send()
+        except:
+            print('ЯНДЕКС ПОСЧИТАЛ ПИСЬМО ЗА СПАМ. возможно заблокировал почту на 24 часа')
+
+    def form_valid(self, form):
+        title = form.cleaned_data['title']
+        text = form.cleaned_data['text'][:50]
+        subscribers_data = dict()
+        for category in form.cleaned_data['category']:
+            subscribers = category.subscribers.all()
+            for user in subscribers:
+                if user.username not in subscribers_data:
+                    subscribers_data[user.username] = user.email
+        for username, email in subscribers_data.items():
+            self.send_message(username, email, title, text)
+        return super().form_valid(form)
+
 
 class PostUpdate(PermissionRequiredMixin, UpdateView):
     permission_required = ('news.change_post',)
@@ -110,7 +152,7 @@ class PostDelete(PermissionRequiredMixin, DeleteView):
     permission_required = ('news.delete_post',)
     template_name = 'postDelete.html'
     queryset = Post.objects.all()
-    success_url = '/news/'
+    success_url = '/'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -131,3 +173,20 @@ def get_in_author_group(request):
     redirect_from = request.META['HTTP_REFERER']
     return redirect(redirect_from)
 
+
+@login_required
+def subscribe(request):
+    redirect_from = request.META['HTTP_REFERER']
+    if request.method == 'POST':
+        form = SubscribeForm(request.POST)
+        user = request.user
+        alredy_subscribed = Category.objects.filter(subscribers__in=[user.id])
+        if form.is_valid():
+            checked_categories = form.cleaned_data['name']
+            for category in checked_categories:
+                if category not in alredy_subscribed:
+                    category.subscribers.add(user)
+            for category in alredy_subscribed:
+                if category not in checked_categories:
+                    category.subscribers.remove(user)
+    return redirect(redirect_from)

@@ -2,9 +2,14 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum
 
+class UserSubscriber(models.Model):
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    category = models.ForeignKey('Category', on_delete=models.DO_NOTHING)
+
 
 class Category(models.Model):
     name = models.CharField(max_length=255, unique=True)
+    subscribers = models.ManyToManyField(User, through=UserSubscriber)
 
     def __str__(self):
         return self.name
@@ -40,7 +45,7 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         # после добавления поста через форму django сам перенаправляет на вохвращаемый здесь адрес
-        return f'/news/{self.id}'
+        return f'/{self.id}'
 
 
 class PostCategory(models.Model):
