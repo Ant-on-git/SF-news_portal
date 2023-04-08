@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'news',
+    'news.apps.NewsConfig',
     'accounts',
     'django_filters',
     'django.contrib.sites',

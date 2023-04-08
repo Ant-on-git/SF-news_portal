@@ -3,8 +3,8 @@
 # Create your views here.
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
-from django.core.mail import EmailMultiAlternatives
 from django.shortcuts import redirect
+from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
@@ -99,35 +99,6 @@ class PostCreate(PermissionRequiredMixin, CreateView):
             context['is_not_author'] = not user.groups.filter(name='authors').exists()
         return context
 
-    @staticmethod
-    def send_message(username, email, title, text):
-        html_email_message = render_to_string('email/new_post_email_notification.html', {'username': username, 'title': title,'text': text})
-        msg = EmailMultiAlternatives(
-            subject=title,
-            body=text,
-            from_email='17smile17@rambler.ru',
-            to=[email]
-        )
-        msg.attach_alternative(html_email_message, 'text/html')
-        try:
-            msg.send()
-        except Exception as e:
-            print('ошибка при отправке письма. возможно, ЯНДЕКС ПОСЧИТАЛ ПИСЬМО ЗА СПАМ и возможно заблокировал почту на 24 часа')
-            print(e)
-
-
-    def form_valid(self, form):
-        title = form.cleaned_data['title']
-        text = form.cleaned_data['text'][:50]
-        subscribers_data = dict()
-        for category in form.cleaned_data['category']:
-            subscribers = category.subscribers.all()
-            for user in subscribers:
-                if user.username not in subscribers_data:
-                    subscribers_data[user.username] = user.email
-        for username, email in subscribers_data.items():
-            self.send_message(username, email, title, text)
-        return super().form_valid(form)
 
 
 class PostUpdate(PermissionRequiredMixin, UpdateView):
