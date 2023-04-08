@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title</title>
+</head>
+<body>
+    {% load account %}  <!-- Загружаем тег, который позволит получить нам ссылку на подтверждение -->
+    <h1>Регистрация на сайте newspaper.com</h1>
+    <p>Вы получили это письмо потому, что ваш адрес электронной почты был указан при регистрации на сайте newspaper.com</p>
+    <p>Если регистрировались не вы, то просто проигнорируйте это письмо</p>
+    <p>Для подтверждения регистрации перейдите <a href="{{ activate_url }}">по ссылке</a></p>
+</body>
+</html>

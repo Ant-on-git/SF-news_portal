@@ -8,7 +8,7 @@ from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
-from .models import Post, Comment, Category
+from .models import Post, Comment, Category, Author
 from .filters import PostFilter
 from .forms import PostForm, SubscribeForm
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -101,18 +101,20 @@ class PostCreate(PermissionRequiredMixin, CreateView):
 
     @staticmethod
     def send_message(username, email, title, text):
-        html_email_message = render_to_string('new_post_email_notification.html', {'username': username, 'title': title,'text': text})
+        html_email_message = render_to_string('email/new_post_email_notification.html', {'username': username, 'title': title,'text': text})
         msg = EmailMultiAlternatives(
             subject=title,
             body=text,
-            from_email='A909NT@yandex.ru',
+            from_email='17smile17@rambler.ru',
             to=[email]
         )
         msg.attach_alternative(html_email_message, 'text/html')
         try:
             msg.send()
-        except:
-            print('ЯНДЕКС ПОСЧИТАЛ ПИСЬМО ЗА СПАМ. возможно заблокировал почту на 24 часа')
+        except Exception as e:
+            print('ошибка при отправке письма. возможно, ЯНДЕКС ПОСЧИТАЛ ПИСЬМО ЗА СПАМ и возможно заблокировал почту на 24 часа')
+            print(e)
+
 
     def form_valid(self, form):
         title = form.cleaned_data['title']
@@ -167,9 +169,14 @@ class PostDelete(PermissionRequiredMixin, DeleteView):
 
 @login_required
 def get_in_author_group(request):
+    # добавляем в группу авторы (django.contrib.auth.models)  (там раздаем права)
     author_group = Group.objects.get(name='authors')
     if not request.user.groups.filter(name='authors').exists():
         author_group.user_set.add(request.user)
+    # добавляем в модель авторы (news.models) (она была создана в начале хз зачем. но раз есть, то добавляем)
+    authors_users = [a.user for a in Author.objects.all()]
+    if request.user not in authors_users:
+        Author.objects.create(user=request.user)
     redirect_from = request.META['HTTP_REFERER']
     return redirect(redirect_from)
 
