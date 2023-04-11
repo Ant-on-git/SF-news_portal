@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     # ... include the providers you want to enable:
     'allauth.socialaccount.providers.google',
+    'django_apscheduler',
 ]
 
 MIDDLEWARE = [
@@ -133,6 +134,15 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER + '@rambler.ru'
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True  # позволит избежать дополнительных действий и активирует аккаунт сразу, как только мы перейдём по ссылке (не обяз)
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1 # количество дней, в течение которых будет доступна ссылка на подтверждение регистрации и так далее (не обяз)
 # все поля для настроек allauth:  https://django-allauth.readthedocs.io/en/latest/configuration.html
+
+
+# Строка формата для отображения меток времени выполнения на сайте администрирования Django. Значение по умолчанию
+# просто добавляет секунды к стандартному формату Django, что полезно для отображения временных меток
+# для заданий, выполнение которых запланировано с интервалом менее одной минуты.
+# См. https://docs.djangoproject.com/en/dev/ref/settings/#datetime-format для получения информации о синтаксисе # строки формата
+APSCHEDULER_DATETIME_FORMAT = "j.m.Y G:i:s"
+# если задача не выполняется за 25 секунд, то она автоматически снимается, можете поставить время побольше, но как правило, это сильно бьёт по производительности сервера
+APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds
 
 
 # Database
