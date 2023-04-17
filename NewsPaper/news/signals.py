@@ -3,6 +3,7 @@ from django.template.loader import render_to_string
 from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
 from .models import Post, User
+from django.conf.global_settings import DEFAULT_FROM_EMAIL
 
 
 def send_new_post_email(username, email, title, text, id):
@@ -11,7 +12,7 @@ def send_new_post_email(username, email, title, text, id):
     msg = EmailMultiAlternatives(
         subject=title,
         body=text,
-        from_email='17smile17@rambler.ru',
+        from_email=DEFAULT_FROM_EMAIL,
         to=[email]
     )
     msg.attach_alternative(html_email_message, 'text/html')
@@ -44,7 +45,7 @@ def notify_subscribers_new_post(sender, instance, created, **kwargs):
                                           {'username': instance.username, 'href': 'http://127.0.0.1:8000'})
     msg = EmailMultiAlternatives(
         subject=f'newspaper.com приветствует тебя, {instance.username}',
-        from_email='17smile17@rambler.ru',
+        from_email=DEFAULT_FROM_EMAIL,
         to=[instance.email]
     )
     msg.attach_alternative(html_email_message, 'text/html')

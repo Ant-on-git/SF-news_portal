@@ -1,9 +1,10 @@
 from django.urls import path
 from .views import PostList, PostDetail, PostSearch, PostCreate, PostUpdate, PostDelete, get_in_author_group, subscribe
+from django.views.decorators.cache import cache_page
 
 
 urlpatterns = [
-    path('', PostList.as_view()),
+    path('', cache_page(60*1)(PostList.as_view())),  # кешируем страницу на 60 секунд
     path('<int:pk>', PostDetail.as_view(), name='detail_post'),
     path('search', PostSearch.as_view(), name='search_post'),
     path('add', PostCreate.as_view(), name='create_post'),

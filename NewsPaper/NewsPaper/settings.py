@@ -24,7 +24,7 @@ dotenv_data = dotenv_values(dotenv_path=os.path.abspath(os.path.join(BASE_DIR, '
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-yl5xva3$xq8e$q6&5dn$4tseo^-qb5ztoc$_os(!d1hu7@ng2m'
+SECRET_KEY = dotenv_data.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -111,8 +111,8 @@ SOCIALACCOUNT_PROVIDERS = {
         # (``socialaccount`` app) containing the required client
         # credentials, or list them here:
         'APP': {
-            'client_id': '57202151761-dqekfhq55skfmdlk25uikj2p4he318l7.apps.googleusercontent.com',
-            'secret': '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',
+            'client_id': dotenv_data.get('GOOGLE_CLIENT_ID'),
+            'secret': dotenv_data.get('GOOGLE_SECRET'),
             'key': ''
         }
     }
@@ -125,7 +125,7 @@ WSGI_APPLICATION = 'NewsPaper.wsgi.application'
 
 EMAIL_HOST = 'smtp.rambler.ru' # адрес сервера Яндекс-почты для всех один и тот же
 EMAIL_PORT = 465 # порт smtp сервера тоже одинаковый
-EMAIL_HOST_USER = '17smile17' # ваше имя пользователя, например если ваша почта user@yandex.ru, то сюда надо писать user, иными словами, это всё то что идёт до собаки
+EMAIL_HOST_USER = dotenv_data.get('rambler_EMAIL_HOST_USER') # ваше имя пользователя, например если ваша почта user@yandex.ru, то сюда надо писать user, иными словами, это всё то что идёт до собаки
 EMAIL_USE_SSL = True # Яндекс использует ssl, подробнее о том, что это, почитайте на Википедии, но включать его здесь обязательно
 EMAIL_HOST_PASSWORD = dotenv_data.get('rambler_EMAIL_HOST_PASSWORD')
 
@@ -143,6 +143,14 @@ ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1 # количество дней, в �
 APSCHEDULER_DATETIME_FORMAT = "j.m.Y G:i:s"
 # если задача не выполняется за 25 секунд, то она автоматически снимается, можете поставить время побольше, но как правило, это сильно бьёт по производительности сервера
 APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.path.join(BASE_DIR, 'cache_files'),  # Указываем, куда будем сохранять кэшируемые файлы
+    }
+}
 
 
 # Database

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum
+from django.core.cache import cache
 
 class UserSubscriber(models.Model):
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
@@ -29,6 +30,18 @@ class Post(models.Model):
     author = models.ForeignKey('Author', on_delete=models.CASCADE)
     category = models.ManyToManyField('Category', through='PostCategory')
 
+    def save(self, *args, **kwargs):
+        # переопределяем метод, чтобы при изменении поста он удалялся из кеша
+        super().save(*args, **kwargs)  # сначала вызываем метод родителя, чтобы объект сохранился
+        cache.delete(f"post-{self.pk}")
+
+    def __str__(self):
+        return self.title
+
+    def get_absolute_url(self):
+        # после добавления поста через форму django сам перенаправляет на вохвращаемый здесь адрес
+        return f'/{self.id}'
+
     def like(self):
         self.rating += 1
         self.save()
@@ -39,13 +52,6 @@ class Post(models.Model):
 
     def preview(self):
         return self.text[:50] + '...'
-
-    def __str__(self):
-        return self.title
-
-    def get_absolute_url(self):
-        # после добавления поста через форму django сам перенаправляет на вохвращаемый здесь адрес
-        return f'/{self.id}'
 
 
 class PostCategory(models.Model):

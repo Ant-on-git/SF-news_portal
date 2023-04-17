@@ -5,11 +5,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.core.cache import cache
 
 from .models import Post, Comment, Category, Author
 from .filters import PostFilter
 from .forms import PostForm, SubscribeForm
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+
 
 
 class PostList(ListView):
@@ -33,6 +35,15 @@ class PostDetail(DetailView):
     model = Post
     template_name = 'postDetails.html'
     context_object_name = 'post'
+
+    def get_object(self, *args, **kwargs):
+        obj = cache.get(f"post-{self.kwargs['pk']}", None)  # если в кеше есть пост, достаем его оттуда
+        if not obj:  # если поста в кеше нет, то получаем его и записываем в кеш
+            obj = super().get_object(queryset=self.queryset)
+            cache.set(f"post-{self.kwargs['pk']}", obj)
+        return obj
+
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
