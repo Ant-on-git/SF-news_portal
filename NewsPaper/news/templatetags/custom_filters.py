@@ -38,3 +38,18 @@ def censor(text):
                 word_list[i] = word[:start_ind] + '*' * len(negative) + word[end_ind:]
     return ' '.join(word_list)
 
+
+'''
+Реализуйте фильтр, который заменяет все буквы кроме первой и последней на «*» у слов из списка «нежелательных». 
+Предполагается, что в качестве аргумента гарантированно передается текст, и слова разделены пробелами. 
+Можно считать, что запрещенные слова находятся в списке forbidden_words.
+'''
+@register.filter(name='middleCensor')
+def middleCensor(text):
+    forbidden_words = ['жопа', 'хрен']
+    words = text.split()
+    for i, word in enumerate(text):
+        if word.lower() in forbidden_words:
+            words[i] = word[0] + '*'*len(word[1:-1]) + word[-1]
+    return ' '.join(words)
+

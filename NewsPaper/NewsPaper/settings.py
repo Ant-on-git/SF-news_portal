@@ -59,13 +59,13 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.security.SecurityMiddleware',            # один из главных промежуточных слоев, потому что он реализует различные проверки безопасности — XSS, nosniff, HSTS, CORS, поддержка SSL и т. д.
+    'django.contrib.sessions.middleware.SessionMiddleware',     # Включает механизм сессий в разрабатываемом приложении.
+    'django.middleware.common.CommonMiddleware',                #
+    'django.middleware.csrf.CsrfViewMiddleware',                #
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # Реализует основы аутентификации и идентификации.
+    'django.contrib.messages.middleware.MessageMiddleware',     # Включает поддержку сообщений, лежащих в основе работы с куки и сессиями.
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',   #
 ]
 
 ROOT_URLCONF = 'NewsPaper.urls'
@@ -204,3 +204,122 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+ADMINS = [("Admin1", "a909nt@yandex.ru"), ("Admin2", "a909nt@yandex.ru")]
+
+
+
+'''
+В консоль должны выводиться все сообщения уровня DEBUG и выше, включающие время, уровень сообщения, сообщения. Для сообщений WARNING и выше дополнительно должен выводиться путь к источнику события (используется аргумент pathname в форматировании). А для сообщений ERROR и CRITICAL еще должен выводить стэк ошибки (аргумент exc_info). Сюда должны попадать все сообщения с основного логгера django.
+В файл general.log должны выводиться сообщения уровня INFO и выше только с указанием времени, уровня логирования, модуля, в котором возникло сообщение (аргумент module) и само сообщение. Сюда также попадают сообщения с регистратора django
+В файл errors.log должны выводиться сообщения только уровня ERROR и CRITICAL. В сообщении указывается время, уровень логирования, само сообщение, путь к источнику сообщения и стэк ошибки. В этот файл должны попадать сообщения только из логгеров django.request, django.server, django.template, django.db_backends.
+В файл security.log должны попадать только сообщения, связанные с безопасностью, а значит только из логгера django.security. Формат вывода предполагает время, уровень логирования, модуль и сообщение.
+На почту должны отправляться сообщения уровней ERROR и выше из django.request и django.server, по формату как в errors.log, но без стэка ошибок.
+Более того, при помощи фильтров указать, что в консоль сообщения отправляются только при DEBUG = True, а на почту и в файл general.log только при DEBUG = False.
+'''
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '{asctime} {levelname} {message}',
+            'style': '{'
+        },
+        'pathname': {
+            'format': '{asctime} {levelname} {message} {pathname}',
+            'style': '{'
+        },
+        'exc_info': {
+            'format': '{asctime} {levelname} {message} {exc_info}',
+            'style': '{'
+        },
+        'formaterFileGeneral': {
+            'format': '{asctime} {levelname} {module} {message}',
+            'style': '{'
+        },
+        'formaterFileErrors': {
+            'format': '{asctime} {levelname} {message} {pathname} {exc_info}',
+            'style': '{'
+        },
+    },
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+    },
+    'handlers': {
+        'consoleDebug': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+            'filters': ['require_debug_true'],
+        },
+        'consoleWarning': {
+            'level': 'WARNING',
+            'class': 'logging.StreamHandler',
+            'formatter': 'pathname',
+            'filters': ['require_debug_true'],
+        },
+        'consoleError': {
+            'level': 'ERROR',
+            'class': 'logging.StreamHandler',
+            'formatter': 'exc_info',
+            'filters': ['require_debug_true'],
+        },
+        'fileGeneral': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'formatter': 'formaterFileGeneral',
+            'filename': 'general.log',
+            'filters': ['require_debug_false'],
+        },
+        'fileErrors': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'formatter': 'formaterFileErrors',
+            'filename': 'errors.log'
+        },
+        'fileSecurity': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'formatter': 'formaterFileGeneral',
+            'filename': 'security.log'
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'formatter': 'pathname',
+            'filters': ['require_debug_false'],
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['consoleDebug', 'consoleWarning', 'consoleError', 'fileGeneral'],
+            'propagate': True,  # возможность передачи сообщения другим логгерам. Если оно установлено в False то дальше сообщение не пойдет.
+        },
+        'django.request': {
+            'handlers': ['fileErrors', 'mail_admins'],
+            'propagate': True,
+        },
+        'django.server': {
+            'handlers': ['fileErrors', 'mail_admins'],
+            'propagate': True,
+        },
+        'django.template': {
+            'handlers': ['fileErrors'],
+            'propagate': True,
+        },
+        'django.db_backends': {
+            'handlers': ['fileErrors'],
+            'propagate': True,
+        },
+        'django.security': {
+            'handlers': ['fileSecurity'],
+            'propagate': True,
+        }
+    }
+}

@@ -3,7 +3,7 @@ from django.template.loader import render_to_string
 from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
 from .models import Post, User
-from django.conf.global_settings import DEFAULT_FROM_EMAIL
+from django.conf import settings
 
 
 def send_new_post_email(username, email, title, text, id):
@@ -12,7 +12,7 @@ def send_new_post_email(username, email, title, text, id):
     msg = EmailMultiAlternatives(
         subject=title,
         body=text,
-        from_email=DEFAULT_FROM_EMAIL,
+        from_email=settings.DEFAULT_FROM_EMAIL,
         to=[email]
     )
     msg.attach_alternative(html_email_message, 'text/html')
@@ -21,6 +21,7 @@ def send_new_post_email(username, email, title, text, id):
     except Exception as e:
         print('ошибка при отправке письма. возможно, ЯНДЕКС\РАМБЛЕР ПОСЧИТАЛ ПИСЬМО ЗА СПАМ и заблокировал почту на 24 часа')
         print(e)
+        print('DEFAULT_FROM_EMAIL(signals)', settings.DEFAULT_FROM_EMAIL)
 
 
 @receiver(m2m_changed, sender=Post.category.through)  # на сайте объясняется через post_save - срабатывает при сохранении поста. НО, ОКАЗЫВАЕТСЯ ЭТО НЕ РАБОТАЕТ ПРИ СВЯЗЯХ manyToMany. ПОТОМУ ОБЪЯСНЕНИЕ САЙТА ИДЕТ НАХРЕН. ДЛЯ отслеживания m2m нужно использовать m2m_changed
