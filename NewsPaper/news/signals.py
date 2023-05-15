@@ -46,7 +46,7 @@ def notify_subscribers_new_post(sender, instance, created, **kwargs):
                                           {'username': instance.username, 'href': 'http://127.0.0.1:8000'})
     msg = EmailMultiAlternatives(
         subject=f'newspaper.com приветствует тебя, {instance.username}',
-        from_email=DEFAULT_FROM_EMAIL,
+        from_email=settings.DEFAULT_FROM_EMAIL,
         to=[instance.email]
     )
     msg.attach_alternative(html_email_message, 'text/html')
